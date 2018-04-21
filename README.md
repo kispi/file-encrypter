@@ -7,7 +7,7 @@ Renaming utility implemented in Golang.
 > 2. go build  
 > 3. 'renamer' binary will be generated.  
 
-> Usage:
+> Usage:  
 > EX I:) renamer -p ./ -e (Rename all files to have encrypted names starting from current directory.)  
 > EX II:) renamer -p ./ -d (If filenames are encrypted via statement above, they will be decrypted by this.)  
 > EX III:) renamer [-h] (Show help)  
