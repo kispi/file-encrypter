@@ -48,5 +48,10 @@ func main() {
 		return
 	}
 
-	helpers.Printf(color.FgHiMagenta, "%d / %d files are renamed.", success, success+fail)
+	if renamer.MODE == constant.ENCRYPT {
+		helpers.Printf(color.FgHiMagenta, "%d / %d filenames are encrypted.", success, success+fail)
+	} else if renamer.MODE == constant.DECRYPT {
+		helpers.Printf(color.FgHiMagenta, "%d / %d filenames are decrypted.", success, success+fail)
+	}
+
 }

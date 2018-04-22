@@ -122,7 +122,14 @@ func parseCommandLineArguments(args []string) (options []*Option, err error) {
 
 func showHelp() {
 	helpers.Printf(color.FgWhite, "\n    2018-04-21, kispi@naver.com\n\n")
-	helpers.Printf(color.FgWhite, "    This encrypts all filenames in specified path using crypto/cipher.(%s)\n", renamer.MyName)
-	helpers.Printf(color.FgCyan, "\n    OPTIONS:\n\n    -e: ENCRYPT\n    -d: DECRYPT\n    -h: SHOW HELP\n    -p: PATH\n\n")
+	helpers.Printf(color.FgWhite, "    This program encrypts all filenames in specified path using crypto/cipher.\n")
+	helpers.Printf(color.FgWhite, "    This doesn't change the content of file, but just name.\n")
+	helpers.Printf(color.FgWhite, "    That is, even after the filename has been changed,\n")
+	helpers.Printf(color.FgWhite, "    it can be executed if opened with proper application.\n\n")
+	helpers.Printf(color.FgCyan, "    OPTIONS:\n\n")
+	helpers.Printf(color.FgCyan, "    -e: ENCRYPT\n")
+	helpers.Printf(color.FgCyan, "    -d: DECRYPT\n")
+	helpers.Printf(color.FgCyan, "    -p: PATH\n")
+	helpers.Printf(color.FgCyan, "    -h: SHOW HELP\n\n")
 	helpers.Printf(color.FgWhite, "    EX:) renamer -e -p ./ (encrypt all filenames in current path)\n")
 }
