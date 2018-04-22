@@ -10,7 +10,7 @@ import (
 	"io"
 )
 
-// encrypt string to base64 crypto using AES
+// Encrypt string to base64 crypto using AES
 func Encrypt(key []byte, text string) (string, error) {
 	// key := []byte(keyText)
 	plaintext := []byte(text)
@@ -35,7 +35,7 @@ func Encrypt(key []byte, text string) (string, error) {
 	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
 
-// decrypt from base64 to decrypted string
+// Decrypt from base64 to decrypted string
 func Decrypt(key []byte, cryptoText string) (string, error) {
 	ciphertext, _ := base64.URLEncoding.DecodeString(cryptoText)
 

@@ -13,7 +13,7 @@ func Printf(c color.Attribute, format string, arg ...interface{}) {
 	color.Unset()
 }
 
-// Error prints error message with red font color
+// Error prints error message with red color
 func Error(err error) {
-	Printf(color.FgHiRed, "%s\n", err.Error())
+	Printf(color.BgRed, "%s", err.Error())
 }
