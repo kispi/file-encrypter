@@ -71,7 +71,6 @@ func (r *Renamer) ReadDirRec(prefix string, depth int) {
 			filePath.IsDir = false
 		}
 
-		helpers.Printf(color.FgGreen, "\n%s, %d\n", filePath.FileName, filePath.Depth)
 		r.FilePaths = append(r.FilePaths, filePath)
 
 		if f.IsDir() {
