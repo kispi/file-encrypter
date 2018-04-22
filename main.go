@@ -9,12 +9,6 @@ import (
 	"github.com/fatih/color"
 )
 
-// Option command line option
-type Option struct {
-	Key   string
-	Value string
-}
-
 var renamer Renamer
 var startPath string
 
@@ -27,7 +21,9 @@ func main() {
 			helpers.Error(err)
 			return
 		}
-		err = validateCommandLineArguments(options)
+
+		argument := new(Argument)
+		err = argument.validateCommandLineArguments(options)
 		if err != nil {
 			helpers.Error(err)
 			return

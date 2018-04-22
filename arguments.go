@@ -10,47 +10,76 @@ import (
 	"github.com/fatih/color"
 )
 
-func validateCommandLineArguments(options []*Option) error {
-	encrypt := false
-	decrypt := false
-	help := false
-	path := false
+type Argument struct {
+	Encrypt bool
+	Decrypt bool
+	Help    bool
+	Path    bool
+}
+
+// Option command line option
+type Option struct {
+	Key   string
+	Value string
+}
+
+func (a *Argument) validateCommandLineArguments(options []*Option) error {
+
+	a.Encrypt = false
+	a.Decrypt = false
+	a.Help = false
+	a.Path = false
 	for _, o := range options {
 		switch o.Key {
 		case constant.ENCRYPT:
-			encrypt = true
+			a.Encrypt = true
 		case constant.DECRYPT:
-			decrypt = true
+			a.Decrypt = true
 		case constant.PATH:
-			path = true
+			a.Path = true
 			_, err := ioutil.ReadDir(o.Value)
 			if err != nil {
 				return errors.New("Cannot access to given path")
 			}
 			startPath = o.Value
 		case constant.HELP:
-			help = true
+			a.Help = true
 		}
 	}
 
-	if !help && !path {
+	err := a.makeError()
+	if err != nil {
+		return err
+	}
+
+	if a.Encrypt {
+		renamer.MODE = constant.ENCRYPT
+	} else if a.Decrypt {
+		renamer.MODE = constant.DECRYPT
+	}
+
+	return nil
+}
+
+func (a *Argument) makeError() error {
+	if !a.Help && !a.Path {
 		return errors.New("You must specify the path.(-p [PATH])")
 	}
 
-	if help && (decrypt || encrypt || path) {
+	if a.Help && (a.Decrypt || a.Encrypt || a.Path) {
 		return errors.New("-h cannot be used with other parameters")
 	}
 
-	if help {
+	if a.Help {
 		renamer.MODE = constant.HELP
 	}
 
-	if encrypt && decrypt {
+	if a.Path && (!a.Decrypt && !a.Encrypt) {
+		return errors.New("-p should be used with either -e or -d")
+	}
+
+	if a.Encrypt && a.Decrypt {
 		return errors.New("-e -d cannot be used together")
-	} else if encrypt {
-		renamer.MODE = constant.ENCRYPT
-	} else if decrypt {
-		renamer.MODE = constant.DECRYPT
 	}
 
 	return nil
