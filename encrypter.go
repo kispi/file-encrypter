@@ -107,11 +107,7 @@ func (r *Encrypter) Encrypt(onFile bool) (success int, fail int, err error) {
 		newAbs, _ := filepath.Abs(newPath)
 
 		if onFile {
-			if r.MODE == constant.ENCRYPT {
-				err = r.encryptFile(oldAbs)
-			} else if r.MODE == constant.DECRYPT {
-				err = r.decryptFile(oldAbs)
-			}
+			r.modifyFile(oldAbs)
 		}
 
 		err = os.Rename(oldAbs, newAbs)
@@ -129,47 +125,27 @@ func (r *Encrypter) Encrypt(onFile bool) (success int, fail int, err error) {
 	return success, fail, nil
 }
 
-func (r *Encrypter) encryptFile(oldPath string) error {
-	plaintext, err := ioutil.ReadFile(oldPath)
+func (r *Encrypter) modifyFile(oldPath string) error {
+	var newtext string
+	oldtext, err := ioutil.ReadFile(oldPath)
 	if err != nil {
 		return err
 	}
 
-	text := string(plaintext)
+	text := string(oldtext)
 
-	ciphertext, err := helpers.Encrypt(r.Key, text)
+	if r.MODE == constant.ENCRYPT {
+		newtext, err = helpers.Encrypt(r.Key, text)
+	} else if r.MODE == constant.DECRYPT {
+		newtext, err = helpers.Decrypt(r.Key, text)
+	}
 
-	// create a new file for saving the encrypted data.
 	f, err := os.Create(oldPath)
 	if err != nil {
 		return err
 	}
 
-	_, err = io.Copy(f, bytes.NewReader([]byte(ciphertext)))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *Encrypter) decryptFile(oldPath string) error {
-	ciphertext, err := ioutil.ReadFile(oldPath)
-	if err != nil {
-		return err
-	}
-
-	text := string(ciphertext)
-
-	plaintext, err := helpers.Decrypt(r.Key, text)
-
-	// create a new file for saving the encrypted data.
-	f, err := os.Create(oldPath)
-	if err != nil {
-		return err
-	}
-
-	_, err = io.Copy(f, bytes.NewReader([]byte(plaintext)))
+	_, err = io.Copy(f, bytes.NewReader([]byte(newtext)))
 	if err != nil {
 		return err
 	}
