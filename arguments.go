@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"./constant"
-	"./helpers"
-	"github.com/fatih/color"
 )
 
 type Argument struct {
@@ -118,22 +116,4 @@ func parseCommandLineArguments(args []string) (options []*Option, err error) {
 		}
 	}
 	return
-}
-
-func showHelp() {
-	helpers.Printf(color.FgWhite, "\n    2018-04-21, kispi@naver.com\n\n")
-	helpers.Printf(color.FgWhite, "    This program encrypts all filenames(or files) in specified path using crypto/cipher.\n")
-	helpers.Printf(color.FgWhite, "    This doesn't change the content of file, but just name.\n")
-	helpers.Printf(color.FgWhite, "    That is, even after the filename has been changed,\n")
-	helpers.Printf(color.FgWhite, "    it can be executed if opened with proper application.\n\n")
-	helpers.Printf(color.FgRed, "    CAUTION: Do not decrypt(-d) before you encrypt(-e) by this program\n")
-	helpers.Printf(color.FgRed, "    since there can be some filenames that are already encrypted by AES.\n\n")
-	helpers.Printf(color.FgCyan, "    OPTIONS:\n\n")
-	helpers.Printf(color.FgCyan, "    -e: Encrypt\n")
-	helpers.Printf(color.FgCyan, "    -d: Decrypt\n")
-	helpers.Printf(color.FgCyan, "    -p: Path\n")
-	helpers.Printf(color.FgCyan, "    -k: Custom key.(Will be truncated as proper length and shown after execution.) [NOT_IMPLEMENTED]\n")
-	helpers.Printf(color.FgCyan, "    -h: Hard. This will encrypt the contents of the file. They can't be opened before decryption. [NOT_IMPLEMENTED]\n")
-	helpers.Printf(color.FgCyan, "    [-h]: Show help\n\n")
-	helpers.Printf(color.FgWhite, "    EX:) encrypter -e -p ./ (encrypt all filenames in current path)\n")
 }
