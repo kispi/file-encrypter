@@ -5,4 +5,5 @@ const (
 	DECRYPT = "DECRYPT"
 	PATH    = "PATH"
 	HELP    = "HELP"
+	FILE    = "FILE"
 )

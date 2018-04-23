@@ -1,5 +1,5 @@
 # file encrypter
-File encryption utility implemented in Golang.
+File encryption utility using AES implemented in Golang.
 
 ***
 
@@ -21,7 +21,7 @@ Dependency:
 github.com/fatih/color  
 
 Purpose:  
-If you don't want anyone else can access to your file, you may want to encrypt all the files to not have extension so that they look like not-runnable file. But you definetely don't wanna do that for each and every one of those files by yourself. Then you found the right place. But if somehow they open the file, it'll be opened.
+If you don't want anyone else can access to your file, you may want to encrypt all the files to not have extension so that they look like not-runnable file. But you definetely don't wanna do that for each and every one of those files by yourself. Then you found the right place. But if you don't use this program with -f option, files can be opened. Using -f option will also encrypt the content of file.
 
 ***
 

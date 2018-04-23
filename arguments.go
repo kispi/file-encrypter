@@ -13,6 +13,7 @@ type Argument struct {
 	Decrypt bool
 	Help    bool
 	Path    bool
+	File    bool
 }
 
 // Option command line option
@@ -27,6 +28,7 @@ func (a *Argument) validateCommandLineArguments(options []*Option) error {
 	a.Decrypt = false
 	a.Help = false
 	a.Path = false
+	a.File = false
 	for _, o := range options {
 		switch o.Key {
 		case constant.ENCRYPT:
@@ -42,6 +44,8 @@ func (a *Argument) validateCommandLineArguments(options []*Option) error {
 			startPath = o.Value
 		case constant.HELP:
 			a.Help = true
+		case constant.FILE:
+			a.File = true
 		}
 	}
 
@@ -54,6 +58,10 @@ func (a *Argument) validateCommandLineArguments(options []*Option) error {
 		encrypter.MODE = constant.ENCRYPT
 	} else if a.Decrypt {
 		encrypter.MODE = constant.DECRYPT
+	}
+
+	if a.File {
+		encrypter.OnFile = true
 	}
 
 	return nil
@@ -94,7 +102,9 @@ func parseCommandLineArguments(args []string) (options []*Option, err error) {
 		case "-d":
 			option.Key = constant.DECRYPT
 		case "-h":
-			option.Key = "HELP"
+			option.Key = constant.HELP
+		case "-f":
+			option.Key = constant.FILE
 		case "-p":
 			if i+1 < len(args) {
 				option.Key = constant.PATH
