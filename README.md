@@ -1,5 +1,5 @@
 # file encrypter
-Renaming utility implemented in Golang.
+File encryption utility implemented in Golang.
 
 ***
 
