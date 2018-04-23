@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 
 	"./constant"
@@ -39,12 +40,23 @@ func main() {
 		return
 	}
 
+	// If this succeed, that means it's done on file. So should be terminated.
+	err := tryAsFile(startPath)
+	if err == nil {
+		return
+	}
+
 	last := startPath[len(startPath)-1]
 	if last != '/' && last != '\\' {
 		startPath += string(os.PathSeparator)
 	}
 
-	encrypter.ReadFiles()
+	err = encrypter.ReadFiles()
+	if err != nil {
+		helpers.Error(err)
+		return
+	}
+
 	success, fail, err := encrypter.Encrypt(encrypter.OnFile)
 	if err != nil {
 		helpers.Error(err)
@@ -57,6 +69,21 @@ func main() {
 		helpers.Printf(color.FgHiMagenta, "%d / %d files are decrypted.", success, success+fail)
 	}
 
+}
+
+func tryAsFile(start string) error {
+	// If given path refers to file, not a directory, then do on that file only.
+	_, err := ioutil.ReadFile(start)
+	if err == nil {
+		encrypter.ModifyFile(start)
+		if encrypter.MODE == constant.ENCRYPT {
+			helpers.Printf(color.FgHiMagenta, "%s is encrypted.", startPath)
+		} else if encrypter.MODE == constant.DECRYPT {
+			helpers.Printf(color.FgHiMagenta, "%s is decrypted.", startPath)
+		}
+		return nil
+	}
+	return err
 }
 
 func showHelp() {

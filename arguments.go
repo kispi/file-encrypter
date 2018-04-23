@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"io/ioutil"
 	"strings"
 
 	"./constant"
@@ -29,6 +28,7 @@ func (a *Argument) validateCommandLineArguments(options []*Option) error {
 	a.Help = false
 	a.Path = false
 	a.File = false
+
 	for _, o := range options {
 		switch o.Key {
 		case constant.ENCRYPT:
@@ -37,10 +37,6 @@ func (a *Argument) validateCommandLineArguments(options []*Option) error {
 			a.Decrypt = true
 		case constant.PATH:
 			a.Path = true
-			_, err := ioutil.ReadDir(o.Value)
-			if err != nil {
-				return errors.New("Cannot access to given path")
-			}
 			startPath = o.Value
 		case constant.HELP:
 			a.Help = true
@@ -49,7 +45,7 @@ func (a *Argument) validateCommandLineArguments(options []*Option) error {
 		}
 	}
 
-	err := a.makeError()
+	err := a.testArgumentValidity()
 	if err != nil {
 		return err
 	}
@@ -67,7 +63,7 @@ func (a *Argument) validateCommandLineArguments(options []*Option) error {
 	return nil
 }
 
-func (a *Argument) makeError() error {
+func (a *Argument) testArgumentValidity() error {
 	if !a.Help && !a.Path {
 		return errors.New("You must specify the path.(-p [PATH])")
 	}

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -27,11 +26,12 @@ type FilePath struct {
 
 // Encrypter Encrypter
 type Encrypter struct {
-	FilePaths []*FilePath
-	MODE      string
-	MyName    string
-	OnFile    bool
-	Key       []byte
+	ExcludeExt []string
+	FilePaths  []*FilePath
+	MODE       string
+	MyName     string
+	OnFile     bool
+	Key        []byte
 }
 
 func (r Encrypter) Len() int           { return len(r.FilePaths) }
@@ -39,8 +39,11 @@ func (r Encrypter) Less(i, j int) bool { return r.FilePaths[i].Depth > r.FilePat
 func (r Encrypter) Swap(i, j int)      { r.FilePaths[i], r.FilePaths[j] = r.FilePaths[j], r.FilePaths[i] }
 
 // ReadFiles wrapper for ReadDirRec and Sort
-func (r *Encrypter) ReadFiles() {
-	r.ReadDirRec(startPath, 0)
+func (r *Encrypter) ReadFiles() error {
+	err := r.ReadDirRec(startPath, 0)
+	if err != nil {
+		return err
+	}
 	/* NOTE:
 	Sort sorts acquired paths by it's depth in DESC order.
 	Without this, it's impossible to change directory name.
@@ -48,6 +51,8 @@ func (r *Encrypter) ReadFiles() {
 	So make sure encrypt children files first, and then change it's directory name then.
 	*/
 	r.Sort() // <- Must be executed before encryption.
+
+	return nil
 }
 
 // Sort sorts the filepaths by it's depth.
@@ -56,10 +61,10 @@ func (r *Encrypter) Sort() {
 }
 
 // ReadDirRec reads files recursively.
-func (r *Encrypter) ReadDirRec(prefix string, depth int) {
+func (r *Encrypter) ReadDirRec(prefix string, depth int) error {
 	files, err := ioutil.ReadDir(prefix)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	for _, f := range files {
@@ -81,6 +86,8 @@ func (r *Encrypter) ReadDirRec(prefix string, depth int) {
 			r.ReadDirRec(filePath.EntirePath+"/", depth+1)
 		}
 	}
+
+	return nil
 }
 
 // Encrypt Encrypt
@@ -92,7 +99,7 @@ func (r *Encrypter) Encrypt(onFile bool) (success int, fail int, err error) {
 			continue
 		}
 
-		modifiedName, err := r.getNewName(path.FileName)
+		modifiedName, err := r.makeNewName(path.FileName)
 		if err != nil {
 			errCount++
 			continue
@@ -107,7 +114,7 @@ func (r *Encrypter) Encrypt(onFile bool) (success int, fail int, err error) {
 		newAbs, _ := filepath.Abs(newPath)
 
 		if onFile {
-			r.modifyFile(oldAbs)
+			r.ModifyFile(oldAbs)
 		}
 
 		err = os.Rename(oldAbs, newAbs)
@@ -125,7 +132,7 @@ func (r *Encrypter) Encrypt(onFile bool) (success int, fail int, err error) {
 	return success, fail, nil
 }
 
-func (r *Encrypter) modifyFile(oldPath string) error {
+func (r *Encrypter) ModifyFile(oldPath string) error {
 	var newtext string
 	oldtext, err := ioutil.ReadFile(oldPath)
 	if err != nil {
@@ -153,7 +160,7 @@ func (r *Encrypter) modifyFile(oldPath string) error {
 	return nil
 }
 
-func (r *Encrypter) getNewName(filename string) (modifiedName string, err error) {
+func (r *Encrypter) makeNewName(filename string) (modifiedName string, err error) {
 	if r.MODE == constant.ENCRYPT {
 		modifiedName, err = helpers.Encrypt(r.Key, filename)
 		if err != nil {
