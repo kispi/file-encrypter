@@ -6,12 +6,14 @@ File encryption utility using AES implemented in Golang.
 Build:
 1. clone this repository  
 2. go build  
-3. 'file encrypter' binary will be generated.  
+3. binary will be generated.(following your repository name)  
 
 Usage:  
-EX I:) file encrypter -p ./ -e (Encrypt all files to have encrypted names starting from current directory.)  
-EX II:) file encrypter -p ./ -d (If filenames are encrypted via statement above, they will be decrypted by this.)  
-EX III:) file encrypter [-h] (Show help)  
+EX:) [BINARY] -p ./ -e (Encrypt all files to have encrypted names starting from current directory)  
+EX:) [BINARY] -p ./ -d (If filenames are encrypted via statement above, they will be decrypted by this)  
+EX:) [BINARY] -p ./ -e -f (encrypt all files in current path)  
+EX:) [BINARY] -p ./ -d -f (decrypt all files in current path)  
+EX:) [BINARY] [-h] (Show help)  
 
 Caution:  
 You must test this to see how this works by using non-important bunch of directories and files.  
