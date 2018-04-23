@@ -9,11 +9,11 @@ import (
 	"github.com/fatih/color"
 )
 
-var renamer Renamer
+var encrypter Encrypter
 var startPath string
 
 func main() {
-	renamer.MyName = os.Args[0]
+	encrypter.MyName = os.Args[0]
 	args := os.Args[1:]
 	if len(args) >= 1 {
 		options, err := parseCommandLineArguments(args)
@@ -30,7 +30,7 @@ func main() {
 		}
 	}
 
-	if renamer.MODE == constant.HELP || len(args) < 1 {
+	if encrypter.MODE == constant.HELP || len(args) < 1 {
 		showHelp()
 		return
 	}
@@ -40,17 +40,17 @@ func main() {
 		startPath += string(os.PathSeparator)
 	}
 
-	renamer.ReadFiles()
+	encrypter.ReadFiles()
 
-	success, fail, err := renamer.Rename()
+	success, fail, err := encrypter.Encrypt()
 	if err != nil {
 		helpers.Error(err)
 		return
 	}
 
-	if renamer.MODE == constant.ENCRYPT {
+	if encrypter.MODE == constant.ENCRYPT {
 		helpers.Printf(color.FgHiMagenta, "%d / %d filenames are encrypted.", success, success+fail)
-	} else if renamer.MODE == constant.DECRYPT {
+	} else if encrypter.MODE == constant.DECRYPT {
 		helpers.Printf(color.FgHiMagenta, "%d / %d filenames are decrypted.", success, success+fail)
 	}
 

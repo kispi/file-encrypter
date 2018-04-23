@@ -23,36 +23,36 @@ type FilePath struct {
 	Depth      int // the number of recursions have been executed since the first ReadDirRec calling.
 }
 
-// Renamer Renamer
-type Renamer struct {
+// Encrypter Encrypter
+type Encrypter struct {
 	FilePaths []*FilePath
 	MODE      string
 	MyName    string
 }
 
-func (r Renamer) Len() int           { return len(r.FilePaths) }
-func (r Renamer) Less(i, j int) bool { return r.FilePaths[i].Depth > r.FilePaths[j].Depth }
-func (r Renamer) Swap(i, j int)      { r.FilePaths[i], r.FilePaths[j] = r.FilePaths[j], r.FilePaths[i] }
+func (r Encrypter) Len() int           { return len(r.FilePaths) }
+func (r Encrypter) Less(i, j int) bool { return r.FilePaths[i].Depth > r.FilePaths[j].Depth }
+func (r Encrypter) Swap(i, j int)      { r.FilePaths[i], r.FilePaths[j] = r.FilePaths[j], r.FilePaths[i] }
 
 // ReadFiles wrapper for ReadDirRec and Sort
-func (r *Renamer) ReadFiles() {
+func (r *Encrypter) ReadFiles() {
 	r.ReadDirRec(startPath, 0)
 	/* NOTE:
 	Sort sorts acquired paths by it's depth in DESC order.
 	Without this, it's impossible to change directory name.
 	When try to change child path name, it may not exist if it's parent directory name was changed before.
-	So make sure rename children files first, and then change it's directory name then.
+	So make sure encrypt children files first, and then change it's directory name then.
 	*/
-	renamer.Sort() // <- Must be executed before rename.
+	r.Sort() // <- Must be executed before encryption.
 }
 
 // Sort sorts the filepaths by it's depth.
-func (r *Renamer) Sort() {
+func (r *Encrypter) Sort() {
 	sort.Sort(r)
 }
 
 // ReadDirRec reads files recursively.
-func (r *Renamer) ReadDirRec(prefix string, depth int) {
+func (r *Encrypter) ReadDirRec(prefix string, depth int) {
 	files, err := ioutil.ReadDir(prefix)
 	if err != nil {
 		log.Fatal(err)
@@ -79,8 +79,8 @@ func (r *Renamer) ReadDirRec(prefix string, depth int) {
 	}
 }
 
-// Rename Rename
-func (r *Renamer) Rename() (success int, fail int, err error) {
+// Encrypt Encrypt
+func (r *Encrypter) Encrypt() (success int, fail int, err error) {
 	errCount := 0
 	for _, path := range r.FilePaths {
 
@@ -117,7 +117,7 @@ func (r *Renamer) Rename() (success int, fail int, err error) {
 	return success, fail, nil
 }
 
-func (r *Renamer) getNewName(filename string) (modifiedName string, err error) {
+func (r *Encrypter) getNewName(filename string) (modifiedName string, err error) {
 	key := []byte("You can't hack since I made this")
 	if r.MODE == constant.ENCRYPT {
 		modifiedName, err = helpers.Encrypt(key, filename)
@@ -130,13 +130,14 @@ func (r *Renamer) getNewName(filename string) (modifiedName string, err error) {
 			return "", err
 		}
 	} else {
-		return "", errors.New("Rename mode is not set")
+		return "", errors.New("Encrypt mode is not set")
 	}
 	return modifiedName, nil
 }
 
-func (r *Renamer) exclude(target string) bool {
+func (r *Encrypter) exclude(target string) bool {
 	if target == r.MyName ||
+		"./"+target == r.MyName || // for linux
 		target == r.MyName+".exe" ||
 		target == r.MyName+".bat" {
 		return true
