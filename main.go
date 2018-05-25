@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"./constant"
 	"./helpers"
@@ -75,7 +76,18 @@ func tryAsFile(start string) error {
 	// If given path refers to file, not a directory, then do on that file only.
 	_, err := ioutil.ReadFile(start)
 	if err == nil {
-		encrypter.ModifyFile(start)
+		startAbs, _ := filepath.Abs(start)
+		dir := filepath.Dir(startAbs)
+		base := filepath.Base(startAbs)
+		newBase, _ := encrypter.makeNewName(base)
+		newAbs := filepath.Join(dir, newBase)
+
+		os.Rename(start, newAbs)
+
+		if encrypter.OnFile {
+			encrypter.ModifyFile(newAbs)
+		}
+
 		if encrypter.MODE == constant.ENCRYPT {
 			helpers.Printf(color.FgHiMagenta, "%s is encrypted.", startPath)
 		} else if encrypter.MODE == constant.DECRYPT {

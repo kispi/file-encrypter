@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/fatih/color"
 )
@@ -15,5 +16,6 @@ func Printf(c color.Attribute, format string, arg ...interface{}) {
 
 // Error prints error message with red color
 func Error(err error) {
-	Printf(color.BgRed, "%s", err.Error())
+	_, fn, line, _ := runtime.Caller(1)
+	Printf(color.FgRed, "[ERROR] %s:%d %v\n", fn, line, err.Error())
 }

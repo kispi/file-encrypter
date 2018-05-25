@@ -113,17 +113,23 @@ func (r *Encrypter) Encrypt(onFile bool) (success int, fail int, err error) {
 		oldAbs, _ := filepath.Abs(oldPath)
 		newAbs, _ := filepath.Abs(newPath)
 
-		if onFile {
-			r.ModifyFile(oldAbs)
-		}
-
 		err = os.Rename(oldAbs, newAbs)
 		if err != nil {
 			helpers.Error(err)
 			fail++
-		} else {
-			success++
+			continue
 		}
+
+		if onFile {
+			err = r.ModifyFile(newAbs)
+			if err != nil {
+				helpers.Error(err)
+				fail++
+				continue
+			}
+		}
+
+		success++
 
 		helpers.Printf(color.FgHiBlue, "OLD: %s\n", oldAbs)
 		helpers.Printf(color.FgHiGreen, "NEW: %s\n\n", newAbs)
@@ -132,10 +138,11 @@ func (r *Encrypter) Encrypt(onFile bool) (success int, fail int, err error) {
 	return success, fail, nil
 }
 
-func (r *Encrypter) ModifyFile(oldPath string) error {
+func (r *Encrypter) ModifyFile(path string) error {
 	var newtext string
-	oldtext, err := ioutil.ReadFile(oldPath)
+	oldtext, err := ioutil.ReadFile(path)
 	if err != nil {
+		helpers.Error(err)
 		return err
 	}
 
@@ -147,13 +154,15 @@ func (r *Encrypter) ModifyFile(oldPath string) error {
 		newtext, err = helpers.Decrypt(r.Key, text)
 	}
 
-	f, err := os.Create(oldPath)
+	f, err := os.Create(path)
 	if err != nil {
+		helpers.Error(err)
 		return err
 	}
 
 	_, err = io.Copy(f, bytes.NewReader([]byte(newtext)))
 	if err != nil {
+		helpers.Error(err)
 		return err
 	}
 
